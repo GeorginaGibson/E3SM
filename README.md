@@ -1,3 +1,7 @@
+This branch was forked off master of E3SM-Project/E3SM on 22-Nov-2022, from this commit:
+
+[80b3434ae9 Merge branch 'ambrad/hommexx/crusher-fixes' (PR #5318)](https://github.com/E3SM-Project/E3SM/commit/80b3434ae9226f81cc8650c4cc08e19b6f0e5c28)
+
 [![E3SM Logo](https://e3sm.org/wp-content/themes/e3sm/assets/images/e3sm-logo.png)](https://e3sm.org)
 
 Energy Exascale Earth System Model (E3SM)
