@@ -4403,6 +4403,7 @@
     <MAX_TASKS_PER_NODE>44</MAX_TASKS_PER_NODE>
     <MAX_MPITASKS_PER_NODE>44</MAX_MPITASKS_PER_NODE>
     <mpirun mpilib="default">
+      <aprun_mode>override</aprun_mode>
       <executable>aprun</executable>
       <arguments>
         <arg name="num_tasks">-n {{ total_tasks }}</arg>
@@ -4512,6 +4513,7 @@
     <MAX_TASKS_PER_NODE>192</MAX_TASKS_PER_NODE>
     <MAX_MPITASKS_PER_NODE>192</MAX_MPITASKS_PER_NODE>
     <mpirun mpilib="default">
+      <aprun_mode>override</aprun_mode>
       <executable>aprun</executable>
       <arguments>
         <arg name="num_tasks">-n {{ total_tasks }}</arg>
@@ -4617,6 +4619,7 @@
     <MAX_MPITASKS_PER_NODE>128</MAX_MPITASKS_PER_NODE>
     <PROJECT_REQUIRED>TRUE</PROJECT_REQUIRED>
     <mpirun mpilib="default">
+      <aprun_mode>override</aprun_mode>
       <executable>aprun</executable>
       <arguments>
         <arg name="num_tasks">-n {{ total_tasks }}</arg>
@@ -4794,6 +4797,7 @@
     <MAX_TASKS_PER_NODE>128</MAX_TASKS_PER_NODE>
     <MAX_MPITASKS_PER_NODE>128</MAX_MPITASKS_PER_NODE>
     <mpirun mpilib="default">
+      <aprun_mode>default</aprun_mode>
       <executable>aprun</executable>
       <arguments>
         <arg name="num_tasks">-n {{ total_tasks }}</arg>
@@ -4893,6 +4897,7 @@
     <MAX_TASKS_PER_NODE>128</MAX_TASKS_PER_NODE>
     <MAX_MPITASKS_PER_NODE>128</MAX_MPITASKS_PER_NODE>
     <mpirun mpilib="default">
+      <aprun_mode>override</aprun_mode>
       <executable>aprun</executable>
       <arguments>
         <arg name="num_tasks">-n {{ total_tasks }}</arg>
