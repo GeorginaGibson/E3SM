@@ -396,7 +396,22 @@ contains
       do iCell = 1, nCells
          do iTracer = 1,size(tracersSurfaceValue,1)
             tracersSurfaceValue(iTracer, iCell) = activeTracers(iTracer, minLevelCell(iCell), iCell)
+            tracersBottomValue(iTracer, iCell)  = activeTracers(iTracer, maxLevelCell(iCell), iCell)
          enddo
+
+         surfaceVelocity(indexSurfaceVelocityZonal, iCell) = &
+            velocityZonal(minLevelCell(iCell), iCell)
+         surfaceVelocity(indexSurfaceVelocityMeridional, iCell) = &
+            velocityMeridional(minLevelCell(iCell), iCell)
+
+         bottomVelocity(indexBottomVelocityZonal, iCell) = &
+            velocityZonal(maxLevelCell(iCell), iCell)
+         bottomVelocity(indexBottomVelocityMeridional, iCell) = &
+            velocityMeridional(maxLevelCell(iCell), iCell)
+
+         kineticEnergyCellSurfaceValue(iCell) = kineticEnergyCell(minLevelCell(iCell), iCell)
+         kineticEnergyCellBottomValue(iCell)  = kineticEnergyCell(maxLevelCell(iCell), iCell)
+
       end do
 #ifdef MPAS_OPENACC
       !$acc end kernels

@@ -2648,6 +2648,14 @@
 				description="salinity extrapolated to ocean surface"
 			/>
 		</var_array>
+                <var_array name="tracersBottomValue" type="real" dimensions="nCells Time">
+                        <var name="temperatureBottomValue" array_group="bottomValues" units="C" name_in_code="temperatureBottomValue"
+                                description="potential temperature in lowest active model level"
+                        />
+                        <var name="salinityBottomValue" array_group="bottomValues" units="1.e-3" name_in_code="salinityBottomValue"
+                                description="salinity in lowest active model level"
+                        />
+                </var_array>
 		<var_array name="tracersSurfaceLayerValue" type="real" dimensions="nCells Time" packages="forwardMode;analysisMode">
 			<var name="temperatureSurfaceLayerValue" array_group="surfaceLayerValues" units="C" name_in_code="temperatureSurfaceLayerValue"
 				description="potential temperature averaged over ocean surface layer (generally 0.1 of the ocean boundary layer)"
@@ -2669,6 +2677,15 @@
 				 description="Meridional surface velocity reconstructed at cell centers"
 			/>
 		</var_array>
+                <var_array name="bottomVelocity" type="real" dimensions="nCells Time" packages="forwardMode;analysisMode">
+                        <var name="bottomVelocityZonal" array_group="velb_zonal" units="m s^-1"
+                                 description="Zonal bottom velocity reconstructed at cell centers"
+
+                        />
+                        <var name="bottomVelocityMeridional" array_group="velb_meridional" units="m s^-1"
+                                 description="Meridional bottom velocity reconstructed at cell centers"
+                        />
+                </var_array>
 		<var name="surfacePressure" type="real" dimensions="nCells Time" units="Pa"
 			description="Pressure at the sea surface due to atmosphere, sea ice, frazil and land ice"
 		/>
@@ -2772,6 +2789,16 @@
 			 description="kinetic energy of horizontal velocity on cells"
 			 packages="forwardMode;analysisMode"
 		/>
+                <var name="kineticEnergyCellSurfaceValue" type="real" dimensions="nCells Time" units="m^2 s^-2"
+                         description="kinetic energy of horizontal velocity on cells in top active model layer"
+                         missing_value="FILLVAL" missing_value_mask="cellMask"
+                         packages="forwardMode;analysisMode"
+                />
+                <var name="kineticEnergyCellBottomValue" type="real" dimensions="nCells Time" units="m^2 s^-2"
+                         description="kinetic energy of horizontal velocity on cells in bottom active model layer"
+                         missing_value="FILLVAL" missing_value_mask="cellMask"
+                         packages="forwardMode;analysisMode"
+                />
 		<var name="viscosity" type="real" dimensions="nVertLevels nEdges Time" units="m^2 s^-1"
 			 description="horizontal viscosity"
 			 packages="forwardMode;analysisMode"

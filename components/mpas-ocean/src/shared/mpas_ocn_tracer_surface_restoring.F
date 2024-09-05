@@ -425,11 +425,13 @@ contains
       call mpas_dmpar_sum_real_array(dminfo, nSums, sums(1:nSums), reductions(1:nSums))
       sumAreaDeltaSGlobal = reductions(1)
       sumAreaGlobal       = reductions(2)
-      avgDeltaS1 = sumAreaDeltaSGlobal/(sumAreaGlobal + 1.e-20_RKIND)
-      !LPV: There is no guarantee that a global sum of deltaS is BFB across
-      !decompositions, the next line rounds each value to 10 decimal places to
-      !ensure BFB results
-      avgDeltaS = float (int(avgDeltaS1 * 1.0E10_RKIND + 0.5_RKIND)) / 1.0E10_RKIND
+!maltrud dont do the BFB stuff
+!     avgDeltaS1 = sumAreaDeltaSGlobal/(sumAreaGlobal + 1.e-20_RKIND)
+!     !LPV: There is no guarantee that a global sum of deltaS is BFB across
+!     !decompositions, the next line rounds each value to 10 decimal places to
+!     !ensure BFB results
+!     avgDeltaS = float (int(avgDeltaS1 * 1.0E10_RKIND + 0.5_RKIND)) / 1.0E10_RKIND
+      avgDeltaS = sumAreaDeltaSGlobal/(sumAreaGlobal + 1.e-20_RKIND)
 
       block => domain % blocklist
       do while (associated(block))

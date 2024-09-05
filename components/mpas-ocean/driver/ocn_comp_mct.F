@@ -1989,7 +1989,8 @@ contains
            icebergHeatFlux(i) = x2o_o % rAttr(index_x2o_Fioi_bergh, n)
         end if
         if ( snowFluxField % isActive ) then
-           snowFlux(i) = x2o_o % rAttr(index_x2o_Faxa_snow, n)
+! precip factor
+           snowFlux(i) = x2o_o % rAttr(index_x2o_Faxa_snow, n) * 0.985_RKIND
         end if
         if ( seaIceFreshWaterFluxField % isActive ) then
            seaIceFreshWaterFlux(i) = x2o_o % rAttr(index_x2o_Fioi_meltw, n)
@@ -2028,7 +2029,8 @@ contains
         end if
 
         if ( rainFluxField % isActive ) then
-           rainFlux(i) = x2o_o % rAttr(index_x2o_Faxa_rain, n)
+! precip factor
+           rainFlux(i) = x2o_o % rAttr(index_x2o_Faxa_rain, n) * 0.985_RKIND
         end if
         if ( atmosphericPressureField % isActive ) then
            atmosphericPressure(i) = x2o_o % rAttr(index_x2o_Sa_pslv,   n)

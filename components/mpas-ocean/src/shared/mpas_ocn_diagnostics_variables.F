@@ -74,6 +74,7 @@ module ocn_diagnostics_variables
    real (kind=RKIND), dimension(:), pointer :: ssh_sal
 
    real (kind=RKIND), dimension(:,:), pointer :: tracersSurfaceValue
+   real (kind=RKIND), dimension(:,:), pointer :: tracersBottomValue
    real (kind=RKIND), dimension(:,:), pointer :: tracersSurfaceLayerValue
    real (kind=RKIND), dimension(:),   pointer :: normalVelocitySurfaceLayer
    real (kind=RKIND), dimension(:),   pointer :: indexSurfaceLayerDepth
@@ -168,23 +169,28 @@ module ocn_diagnostics_variables
    real (kind=RKIND), dimension(:), pointer :: boundaryLayerDepth
    real (kind=RKIND), dimension(:), pointer :: boundaryLayerDepthSmooth
    real (kind=RKIND), dimension(:), pointer :: indexBoundaryLayerDepth
-   integer, pointer :: index_vertNonLocalFluxTemp
+   integer :: index_vertNonLocalFluxTemp
 
    real (kind=RKIND), dimension(:), pointer :: salinitySurfaceRestoringTendency
 
    real (kind=RKIND), dimension(:,:), pointer :: surfaceVelocity
+   real (kind=RKIND), dimension(:,:), pointer :: bottomVelocity
    real (kind=RKIND), dimension(:), pointer :: gradSSHZonal, gradSSHMeridional
    real (kind=RKIND), dimension(:), pointer :: gradSSHX
    real (kind=RKIND), dimension(:), pointer :: gradSSHY
    real (kind=RKIND), dimension(:), pointer :: gradSSHZ
+
+   real (kind=RKIND), dimension(:), pointer :: kineticEnergyCellSurfaceValue
+   real (kind=RKIND), dimension(:), pointer :: kineticEnergyCellBottomValue
 
    real (kind=RKIND), dimension(:), pointer :: barotropicForcing
    real (kind=RKIND), dimension(:), pointer :: barotropicCoriolisTerm
    real (kind=RKIND), dimension(:), pointer :: barotropicThicknessFlux
 
    real (kind=RKIND), dimension(:, :), pointer :: SSHGradient
-   integer, pointer :: indexSurfaceVelocityZonal, indexSurfaceVelocityMeridional
-   integer, pointer :: indexSSHGradientZonal, indexSSHGradientMeridional
+   integer :: indexSurfaceVelocityZonal, indexSurfaceVelocityMeridional
+   integer :: indexBottomVelocityZonal, indexBottomVelocityMeridional
+   integer :: indexSSHGradientZonal, indexSSHGradientMeridional
 
    type (field1DInteger), pointer :: smoothingMaskField
    type (field2DReal), pointer :: verticalStretchField
@@ -234,6 +240,18 @@ contains
       integer, intent(out) :: err !< Output: Error flag
 
       type (mpas_pool_type), pointer :: diagnosticsPool
+
+      ! Local pointers for pool retrievals
+      integer, pointer :: &
+         indexBLTPtr, indexBLSPtr, &
+         indexHeatTransPtr, indexSaltTransPtr, &
+         index_vertNonLocalFluxTempPtr, &
+         indexSurfaceVelocityZonalPtr, &
+         indexSurfaceVelocityMeridionalPtr, &
+         indexBottomVelocityZonalPtr, &
+         indexBottomVelocityMeridionalPtr, &
+         indexSSHGradientZonalPtr, &
+         indexSSHGradientMeridionalPtr
 
       err = 0
 
@@ -384,6 +402,9 @@ contains
                    gradSSHMeridional)
          call mpas_pool_get_array(diagnosticsPool, 'SSHGradient', SSHGradient)
 
+         call mpas_pool_get_array(diagnosticsPool, 'kineticEnergyCellSurfaceValue', kineticEnergyCellSurfaceValue)
+         call mpas_pool_get_array(diagnosticsPool, 'kineticEnergyCellBottomValue', kineticEnergyCellBottomValue)
+
          call mpas_pool_get_array(diagnosticsPool, 'viscosity', viscosity)
          call mpas_pool_get_array(diagnosticsPool, 'divergence', divergence)
          call mpas_pool_get_array(diagnosticsPool, 'circulation', circulation)
@@ -460,6 +481,8 @@ contains
 
          call mpas_pool_get_array(diagnosticsPool, 'surfaceVelocity', &
                    surfaceVelocity)
+         call mpas_pool_get_array(diagnosticsPool, 'bottomVelocity', &
+                   bottomVelocity)
 
          call mpas_pool_get_array(diagnosticsPool, 'vertVelocityTop', &
                    vertVelocityTop)
@@ -535,16 +558,22 @@ contains
          ! Set pointer for index variables
          call mpas_pool_get_dimension(diagnosticsPool, &
                   'index_surfaceVelocityZonal', &
-                   indexSurfaceVelocityZonal)
+                   indexSurfaceVelocityZonalPtr)
          call mpas_pool_get_dimension(diagnosticsPool, &
                   'index_surfaceVelocityMeridional', &
-                   indexSurfaceVelocityMeridional)
+                   indexSurfaceVelocityMeridionalPtr)
+         call mpas_pool_get_dimension(diagnosticsPool, &
+                  'index_bottomVelocityZonal', &
+                   indexBottomVelocityZonalPtr)
+         call mpas_pool_get_dimension(diagnosticsPool, &
+                  'index_bottomVelocityMeridional', &
+                   indexBottomVelocityMeridionalPtr)
          call mpas_pool_get_dimension(diagnosticsPool, &
                   'index_vertNonLocalFluxTemp', &
-                   index_vertNonLocalFluxTemp)
+                   index_vertNonLocalFluxTempPtr)
          call mpas_pool_get_dimension(diagnosticsPool, &
                   'index_SSHGradientMeridional', &
-                   indexSSHGradientMeridional)
+                   indexSSHGradientMeridionalPtr)
          call mpas_pool_get_array(diagnosticsPool, &
                   'indexSurfaceLayerDepth', &
                    indexSurfaceLayerDepth)
@@ -553,7 +582,14 @@ contains
                    indexBoundaryLayerDepth)
          call mpas_pool_get_dimension(diagnosticsPool, &
                   'index_SSHGradientZonal', &
-                   indexSSHGradientZonal)
+                   indexSSHGradientZonalPtr)
+         indexSurfaceVelocityZonal = indexSurfaceVelocityZonalPtr
+         indexSurfaceVelocityMeridional = indexSurfaceVelocityMeridionalPtr
+         indexBottomVelocityZonal = indexBottomVelocityZonalPtr
+         indexBottomVelocityMeridional = indexBottomVelocityMeridionalPtr
+         index_vertNonLocalFluxTemp = index_vertNonLocalFluxTempPtr
+         indexSSHGradientMeridional = indexSSHGradientMeridionalPtr
+         indexSSHGradientZonal = indexSSHGradientZonalPtr
       end if
 
       call mpas_pool_get_array(diagnosticsPool, &
@@ -585,6 +621,9 @@ contains
       call mpas_pool_get_array(diagnosticsPool, &
                'tracersSurfaceValue', &
                 tracersSurfaceValue)
+      call mpas_pool_get_array(diagnosticsPool, &
+               'tracersBottomValue', &
+                tracersBottomValue)
       call mpas_pool_get_array(diagnosticsPool, &
                'surfaceFluxAttenuationCoefficient', &
                 sfcFlxAttCoeff)
@@ -689,6 +728,8 @@ contains
          !$acc                   gradSSHX,                        &
          !$acc                   gradSSHY,                        &
          !$acc                   gradSSHZ,                        &
+         !$acc                   kineticEnergyCellSurfaceValue,   &
+         !$acc                   kineticEnergyCellBottomValue,    &
          !$acc                   viscosity,                       &
          !$acc                   velocityX,                       &
          !$acc                   velocityY,                       &
@@ -710,6 +751,7 @@ contains
          !$acc                   slopeTriadDown,                  &
          !$acc                   normRelVortEdge,                 &
          !$acc                   surfaceVelocity,                 &
+         !$acc                   bottomVelocity,                  &
          !$acc                   vertVelocityTop,                 &
          !$acc                   eddyVelocityX,                   &
          !$acc                   eddyVelocityY,                   &
@@ -736,7 +778,6 @@ contains
          !$acc                   mleVelocityZonal,                &
          !$acc                   bulkRichardsonNumber,            &
          !$acc                   gmStreamFuncTopOfEdge,           &
-         !$acc                   indexSSHGradientZonal,           &
          !$acc                   relativeVorticityCell,           &
          !$acc                   normalGMBolusVelocity,           &
          !$acc                   normalMLEvelocity,               &
@@ -756,13 +797,9 @@ contains
          !$acc                   GMBolusVelocityMeridional,       &
          !$acc                   mleVelocityMeridional,           &
          !$acc                   bulkRichardsonNumberShear,       &
-         !$acc                   indexSurfaceVelocityZonal,       &
          !$acc                   normalVelocitySurfaceLayer,      &
-         !$acc                   index_vertNonLocalFluxTemp,      &
-         !$acc                   indexSSHGradientMeridional,      &
          !$acc                   transportVelocityMeridional,     &
          !$acc                   penetrativeTemperatureFluxOBL,   &
-         !$acc                   indexSurfaceVelocityMeridional,  &
          !$acc                   normalizedRelativeVorticityCell  &
          !$acc                   )
       end if
@@ -856,6 +893,7 @@ contains
       !$acc                   salineContractCoeff,                     &
       !$acc                   pressureAdjustedSSH,                     &
       !$acc                   tracersSurfaceValue,                     &
+      !$acc                   tracersBottomValue,                      &
       !$acc                   daysSinceStartOfSim,                     &
       !$acc                   Time,                                    &
       !$acc                   Time_bnds,                               &
@@ -939,6 +977,8 @@ contains
          !$acc                   gradSSHX,                        &
          !$acc                   gradSSHY,                        &
          !$acc                   gradSSHZ,                        &
+         !$acc                   kineticEnergyCellSurfaceValue,   &
+         !$acc                   kineticEnergyCellBottomValue,    &
          !$acc                   viscosity,                       &
          !$acc                   velocityX,                       &
          !$acc                   velocityY,                       &
@@ -960,6 +1000,7 @@ contains
          !$acc                   slopeTriadDown,                  &
          !$acc                   normRelVortEdge,                 &
          !$acc                   surfaceVelocity,                 &
+         !$acc                   bottomVelocity,                  &
          !$acc                   vertVelocityTop,                 &
          !$acc                   eddyVelocityX,                   &
          !$acc                   eddyVelocityY,                   &
@@ -986,7 +1027,6 @@ contains
          !$acc                   mleVelocityZonal,                &
          !$acc                   bulkRichardsonNumber,            &
          !$acc                   gmStreamFuncTopOfEdge,           &
-         !$acc                   indexSSHGradientZonal,           &
          !$acc                   relativeVorticityCell,           &
          !$acc                   normalGMBolusVelocity,           &
          !$acc                   normalMLEvelocity,               &
@@ -1006,13 +1046,9 @@ contains
          !$acc                   mleVelocityMeridional,           &
          !$acc                   GMBolusVelocityMeridional,       &
          !$acc                   bulkRichardsonNumberShear,       &
-         !$acc                   indexSurfaceVelocityZonal,       &
          !$acc                   normalVelocitySurfaceLayer,      &
-         !$acc                   index_vertNonLocalFluxTemp,      &
-         !$acc                   indexSSHGradientMeridional,      &
          !$acc                   transportVelocityMeridional,     &
          !$acc                   penetrativeTemperatureFluxOBL,   &
-         !$acc                   indexSurfaceVelocityMeridional,  &
          !$acc                   normalizedRelativeVorticityCell  &
          !$acc                   )
       end if
@@ -1106,6 +1142,7 @@ contains
       !$acc                   salineContractCoeff,                     &
       !$acc                   pressureAdjustedSSH,                     &
       !$acc                   tracersSurfaceValue,                     &
+      !$acc                   tracersBottomValue,                      &
       !$acc                   daysSinceStartOfSim,                     &
       !$acc                   Time,                                    &
       !$acc                   Time_bnds,                               &
@@ -1147,6 +1184,8 @@ contains
                  gradSSHX,                        &
                  gradSSHY,                        &
                  gradSSHZ,                        &
+                 kineticEnergyCellSurfaceValue,   &
+                 kineticEnergyCellBottomValue,    &
                  viscosity,                       &
                  velocityX,                       &
                  velocityY,                       &
@@ -1168,6 +1207,7 @@ contains
                  slopeTriadDown,                  &
                  normRelVortEdge,                 &
                  surfaceVelocity,                 &
+                 bottomVelocity,                  &
                  vertVelocityTop,                 &
                  eddyVelocityX,                   &
                  eddyVelocityY,                   &
@@ -1194,7 +1234,6 @@ contains
                  mleVelocityZonal,                &
                  bulkRichardsonNumber,            &
                  gmStreamFuncTopOfEdge,           &
-                 indexSSHGradientZonal,           &
                  relativeVorticityCell,           &
                  normalGMBolusVelocity,           &
                  normalMLEvelocity,               &
@@ -1214,13 +1253,9 @@ contains
                  mleVelocityMeridional,           &
                  GMBolusVelocityMeridional,       &
                  bulkRichardsonNumberShear,       &
-                 indexSurfaceVelocityZonal,       &
                  normalVelocitySurfaceLayer,      &
-                 index_vertNonLocalFluxTemp,      &
-                 indexSSHGradientMeridional,      &
                  transportVelocityMeridional,     &
                  penetrativeTemperatureFluxOBL,   &
-                 indexSurfaceVelocityMeridional,  &
                  normalizedRelativeVorticityCell)
       end if
       if ( trim(config_ocean_run_mode) == 'forward' ) then
@@ -1305,6 +1340,7 @@ contains
               salineContractCoeff,                     &
               pressureAdjustedSSH,                     &
               tracersSurfaceValue,                     &
+              tracersBottomValue,                      &
               daysSinceStartOfSim,                     &
               Time,                                    &
               Time_bnds,                               &
