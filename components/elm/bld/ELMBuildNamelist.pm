@@ -3550,7 +3550,7 @@ sub validate_options {
            # create the @expect array by listing the files in $use_case_dir
            # and strip off the ".xml" part of the filename
            @expect = ();
-           my @files = glob("$opts->{'use_case_dir'}/*.xml");
+           my @files = bsd_glob("$opts->{'use_case_dir'}/*.xml");
            foreach my $file (@files) {
                $file =~ m{.*/(.*)\.xml};
                &check_use_case_name( $1 );

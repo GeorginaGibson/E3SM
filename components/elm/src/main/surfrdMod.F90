@@ -1633,11 +1633,17 @@ contains
 
     wt_nat_patch(begg:,:,0:surfpft_dimlen-1) = array3d_pft(begg:,:,:)
     wt_nat_patch(begg:,:,surfpft_dimlen:surfpft_dimlen+cft_dimlen-1) = array3d_cft(begg:,:,:)
+    print*,"array3d_pft=",array3d_pft
+    print*,"array3d_cft=",array3d_cft
     
     do g = begg, endg
        do t = 1, max_topounits
           if ( wt_lunit(g,t,istcrop) > 0.0_r8 )then
              ! Move CFT over to PFT and do weighted average of the crop and soil parts
+! GG print statements to debug
+	     print*,'wt_nat_patch=',wt_nat_patch
+	     print*,'wt_lunit=',wt_lunit
+	     
              wt_nat_patch(g,t,0:surfpft_dimlen-1) = wt_nat_patch(g,t,0:surfpft_dimlen-1) * wt_lunit(g,t,istsoil)
              wt_nat_patch(g,t,surfpft_dimlen:surfpft_dimlen+cft_dimlen-1)       = &
                   wt_nat_patch(g,t,surfpft_dimlen:surfpft_dimlen+cft_dimlen-1) * wt_lunit(g,t,istcrop)

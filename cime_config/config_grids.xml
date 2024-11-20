@@ -529,6 +529,18 @@
       <mask>ARRM10to60E2r1</mask>
     </model_grid>
 
+% Gibson
+    <model_grid alias="TL319_r05_EC30to60E2r2" compset="(DATM|XATM|SATM)">
+      <grid name="atm">TL319</grid>
+      <grid name="lnd">r05</grid>
+      <grid name="ocnice">EC30to60E2r2</grid>
+      <grid name="rof">r05</grid>
+      <grid name="glc">null</grid>
+      <grid name="wav">null</grid>
+      <mask>EC30to60E2r2</mask>
+    </model_grid>
+
+
     <!-- finite volume grids -->
 
     <model_grid alias="f02_g16">
